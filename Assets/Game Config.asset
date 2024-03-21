@@ -1,0 +1,127 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 455a5528319420748ab94f6954543017, type: 3}
+  m_Name: Game Config
+  m_EditorClassIdentifier: 
+  _playerPrefab: {fileID: 3769423633463748746, guid: e203bbacce299054492ac27d622afbba, type: 3}
+  _enemyPrefab: {fileID: 8265785081038759269, guid: 5593a30efdfa4d74f905c398835eabb7, type: 3}
+  _asteroidPrefab: {fileID: 3383027821899790880, guid: f2400d676e054954db6031bffbb1cdf3, type: 3}
+  _playerShootingProjectile: {fileID: 7962618858446345013, guid: fc19ca69622a19341ab1d327ed44729f, type: 3}
+  _playerStartPosition: {x: 0, y: 0}
+  _playerForwardAcceleration: 10
+  _playerDeceleration: 6
+  _playerRotateSpeed: 0.7
+  _playerMaxSpeed: 6
+  _rotateAction:
+    m_Name: Rotate
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 78392666-6e07-4b9c-9f89-f55f987a0789
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 1D Axis
+      m_Id: 3b86581c-0b81-4916-a925-582c5d6d619e
+      m_Path: 1DAxis
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Rotate
+      m_Flags: 4
+    - m_Name: negative
+      m_Id: 495d4765-e507-4863-a95a-188091b2b416
+      m_Path: <Keyboard>/a
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Rotate
+      m_Flags: 8
+    - m_Name: positive
+      m_Id: c928ff4b-75a5-4850-9334-95020a4534f5
+      m_Path: <Keyboard>/d
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Rotate
+      m_Flags: 8
+    m_Flags: 0
+  _moveAction:
+    m_Name: Move
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: dbfa71b3-6aae-4648-8ad6-09c20a4a37b6
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 0830c276-f1e4-45bf-9fd8-7f0f8ed4360c
+      m_Path: <Keyboard>/w
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Move
+      m_Flags: 0
+    m_Flags: 0
+  _mainShootAction:
+    m_Name: Main Shoot
+    m_Type: 1
+    m_ExpectedControlType: Button
+    m_Id: ef155ac7-1765-433f-8daf-4b798c9c71cf
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 8356971a-dc93-4fea-aa6b-219e4d9e0778
+      m_Path: <Mouse>/leftButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Main Shoot
+      m_Flags: 0
+    m_Flags: 0
+  _laserShootAction:
+    m_Name: Laser Shoot
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 4e6040fc-044f-42c9-a8f2-ea1d7fded992
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 81824b56-6263-406d-a6f2-e0aea0d0a79b
+      m_Path: <Mouse>/rightButton
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Laser Shoot
+      m_Flags: 0
+    m_Flags: 0
+  _screenBoundsThreshold: 0.001
+  _teleportPositionForScreenBounds: 0.005
+  _poolInitialSize: 10
+  _projectileSpeed: 10
+  _projectileLifeDuration: 100
+  _asteroidSpawnPeriod: 3
+  _asteroidSpeed: 2
+  _asteroidScale: 1
+  _miniAsteroidsPerAsteroid: 2
+  _miniAsteroidSpeed: 4
+  _miniAsteroidScale: 0.5
+  _laserDuration: 0.1
+  _laserLength: 100
+  _laserChargeCooldown: 5
+  _laserStartCharges: 3
+  _enemySpawnPeriod: 5
+  _enemySpeed: 2
+  _asteroidScore: 2
+  _miniAsteroidScore: 1
+  _enemyScore: 3
