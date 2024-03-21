@@ -53,11 +53,11 @@ namespace Asteroids.Game {
     public class Asteroid : AsteroidBase {
         public Asteroid(
             AsteroidView view, Vector3 movementVector, float scale, IGameEventEmitter eventDispatcher, 
-            ScreenBoundsChecker screenBoundsChecker, GameConfigSO gameConfig
+            ScreenBoundsChecker screenBoundsChecker
         ) : base(view, movementVector, scale, screenBoundsChecker) {
             view.onCollisionWithPlayerWeapon += (AsteroidView.PlayerWeaponType weaponType) => {
                 eventDispatcher.PushAsteroidDestroyed(this, weaponType);
-                eventDispatcher.PushPlayerScored(gameConfig.AsteroidScore);
+                eventDispatcher.PushPlayerScored(ScoreType.Asteroid);
             };
         }
     }
@@ -65,11 +65,11 @@ namespace Asteroids.Game {
     public class AsteroidMini : AsteroidBase {
         public AsteroidMini(
             AsteroidView view, Vector3 movementVector, float scale, IGameEventEmitter eventDispatcher, 
-            ScreenBoundsChecker screenBoundsChecker, GameConfigSO gameConfig
+            ScreenBoundsChecker screenBoundsChecker
         ) : base(view, movementVector, scale, screenBoundsChecker) {
             view.onCollisionWithPlayerWeapon += (AsteroidView.PlayerWeaponType _) => {
                 eventDispatcher.PushAsteroidMiniDestroyed(this);
-                eventDispatcher.PushPlayerScored(gameConfig.MiniAsteroidScore);
+                eventDispatcher.PushPlayerScored(ScoreType.MiniAsteroid);
             };
         }
     }

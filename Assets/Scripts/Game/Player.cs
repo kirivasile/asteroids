@@ -7,6 +7,7 @@ using Asteroids.Views;
 using UnityEngine;
 
 namespace Asteroids.Game {
+    // TODO KV: Maybe try to return to explicit implementation
     public interface IPlayerWithPosition {
         Vector3 Position { get; }
         float Rotation { get; }
@@ -30,9 +31,10 @@ namespace Asteroids.Game {
     public class Player : ILaserWeapon, IMovablePlayer {
         readonly PlayerView _view;
         readonly ScreenBoundsChecker _screenBoundsChecker;
-        readonly float _laserLength;
+        // readonly float _laserLength;
         readonly float _playerCollisionRadius;
         readonly Vector3 _initialPosition;
+        readonly float _laserLength;
 
         public Vector3 Position => _view.transform.position;
         public float Rotation => _view.transform.eulerAngles.z;
@@ -47,19 +49,19 @@ namespace Asteroids.Game {
             set => _view.LaserIsActive = value;
         }
 
-        public Player(PlayerView view, GameConfigSO gameConfig, ScreenBoundsChecker screenBoundsChecker) {
+        public Player(PlayerView view, IPlayerMovementConfig playerMovementConfig, ILaserConfig laserConfig, ScreenBoundsChecker screenBoundsChecker) {
             _view = view;
             _screenBoundsChecker = screenBoundsChecker;
-            _laserLength = gameConfig.LaserLength;
+            _laserLength = laserConfig.LaserLength;
             // Player have a Polygon Collider. It's easier to use just scale for the collision radius.
             _playerCollisionRadius = view.transform.localScale.x * 0.5f;
 
-            _initialPosition = gameConfig.PlayerStartPosition;
+            _initialPosition = playerMovementConfig.PlayerStartPosition;
 
             var forwardVector = ConvertEulerAnglesToVector(_view.transform.eulerAngles);
 
             view.SetLinePosition(0, view.transform.position);
-            view.SetLinePosition(1, view.transform.position + forwardVector.value * gameConfig.LaserLength);
+            view.SetLinePosition(1, view.transform.position + forwardVector.value * laserConfig.LaserLength);
         }
 
         public void Rotate(float value) {

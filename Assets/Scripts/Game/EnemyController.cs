@@ -12,12 +12,12 @@ namespace Asteroids.Game {
         readonly IGameEventSubscriber _gameEventDispatcher;
 
         public EnemyController(
-            GameConfigSO gameConfig, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker, IPlayerPositionSubscription playerPosition
+            IEnemyConfig config, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker, IPlayerPositionSubscription playerPosition
         ) {
             _enemyPool = new (
-                poolInitialSize: gameConfig.PoolInitialSize,
-                spawnPeriod: gameConfig.EnemySpawnPeriod,
-                createView: () => Object.Instantiate(gameConfig.EnemyPrefab),
+                poolInitialSize: config.EnemyPoolInitialSize,
+                spawnPeriod: config.EnemySpawnPeriod,
+                createView: () => Object.Instantiate(config.EnemyPrefab),
                 createInit: createInit,
                 getView: init => init.view,
                 getPosition: _ => screenBoundsChecker.RandomPositionInsideBounds,
@@ -27,7 +27,7 @@ namespace Asteroids.Game {
             _gameEventDispatcher = eventDispatcher;
 
             Enemy createInit(EnemyView view, Unit _) {
-                return new (view, eventDispatcher, gameConfig.EnemySpeed, gameConfig);
+                return new (view, eventDispatcher, config.EnemySpeed);
             }
         }
 

@@ -10,30 +10,31 @@ namespace Asteroids.Game {
     using ProjectileViewPool = PooledObjectsOnEvent<ProjectileView, Projectile, Vector3>;
 
     public class ProjectileShootingController {
-        readonly GameConfigSO _gameConfig;
+        readonly IShootingConfig _config;
         readonly ProjectileViewPool _projectilePool;
         // TODO KV: docme
         readonly List<Projectile> _projectilesToDisableBuf;
         readonly IPlayerWithPosition _player;
         readonly LayerMask _collisionLayerMask;
 
-        public ProjectileShootingController(GameConfigSO gameConfig, IPlayerWithPosition player) {
-            _gameConfig = gameConfig;
+        public ProjectileShootingController(IPlayerWithPosition player, IShootingConfig shootingConfig, LayerMask collisionMask) {
+            _config = shootingConfig;
             _player = player;
+            _collisionLayerMask = collisionMask;
 
             _projectilePool = new(
-                poolInitialSize: gameConfig.PoolInitialSize,
-                createView: () => UnityEngine.Object.Instantiate(_gameConfig.PlayerShootingProjectile),
+                poolInitialSize: shootingConfig.ProjectilePoolInitialSize,
+                createView: () => UnityEngine.Object.Instantiate(_config.PlayerShootingProjectile),
                 createInit: createInit,
                 getView: init => init.view,
                 getPosition: data => data
             );
             _projectilesToDisableBuf = new();
-            _collisionLayerMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
+            // _collisionLayerMask = 1 << config.AsteroidPrefab.gameObject.layer | 1 << config.EnemyPrefab.gameObject.layer;
 
             Projectile createInit(ProjectileView view, Vector3 position) {
                 return new Projectile(
-                    view, movementVector: _player.ForwardVector.value * _gameConfig.ProjectileSpeed,
+                    view, movementVector: _player.ForwardVector.value * _config.ProjectileSpeed,
                     Time.time, _collisionLayerMask
                 );
             }
@@ -46,7 +47,7 @@ namespace Asteroids.Game {
             _projectilesToDisableBuf.Clear();
 
             foreach (var projectile in _projectilePool.ActiveObjects) {
-                var diedFromTime = projectile.creationTime + _gameConfig.ProjectileLifeDuration <= currentTime;
+                var diedFromTime = projectile.creationTime + _config.ProjectileLifeDuration <= currentTime;
                 var diedFromCollision = projectile.CheckCollisions(dTime);
                 if (diedFromTime || diedFromCollision) {
                     _projectilesToDisableBuf.Add(projectile);
@@ -70,12 +71,12 @@ namespace Asteroids.Game {
         }
 
         public void Enable() {
-            _gameConfig.MainShootAction.Enable();
-            _gameConfig.MainShootAction.performed += ctx => ShootProjectile();
+            _config.MainShootAction.Enable();
+            _config.MainShootAction.performed += ctx => ShootProjectile();
         }
 
         public void Disable() {
-            _gameConfig.MainShootAction.Disable();
+            _config.MainShootAction.Disable();
             _projectilePool.Disable();
             _projectilesToDisableBuf.Clear();
         }

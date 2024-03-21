@@ -10,10 +10,13 @@ namespace Asteroids.Game {
         readonly IGameEventEmitter _gameEventDispatcher;
         readonly LayerMask _collisionMask;
 
-        public PlayerCollisionDetector(IMovablePlayer player, IPlayerSpeedSubscription playerSpeedSubscription, IGameEventEmitter gameEventDispatcher, GameConfigSO gameConfig) {
+        public PlayerCollisionDetector(
+            IMovablePlayer player, IPlayerSpeedSubscription playerSpeedSubscription, IGameEventEmitter gameEventDispatcher, IPlayerConfig gameConfig, LayerMask collisionMask
+        ) {
             _player = player;
             _playerSpeedSubscription = playerSpeedSubscription;
-            _collisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
+            _collisionMask = collisionMask;
+            // _collisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
             _gameEventDispatcher = gameEventDispatcher;
         }
 

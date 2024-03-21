@@ -9,49 +9,44 @@ namespace Asteroids.Game {
     using AsteroidMiniViewPool = PooledObjectsOnEvent<AsteroidView, AsteroidMini, AsteroidMiniData>;
 
     public class AsteroidController {
-        readonly GameConfigSO _gameConfig;
+        readonly IAsteroidConfig _asteroidConfig;
         readonly AsteroidViewPool _asteroidPool;
         readonly AsteroidMiniViewPool _miniAsteroidPool;
         readonly IGameEventSubscriber _eventDispatcher;
 
-        public AsteroidController(GameConfigSO gameConfig, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker) {
-            _gameConfig = gameConfig;
+        public AsteroidController(IAsteroidConfig config, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker) {
+            _asteroidConfig = config;
             _eventDispatcher = eventDispatcher;
             _asteroidPool = new(
-                poolInitialSize: gameConfig.PoolInitialSize,
-                spawnPeriod: gameConfig.AsteroidSpawnPeriod,
-                createView: () => Object.Instantiate(gameConfig.AsteroidPrefab),
+                poolInitialSize: config.AsteroidPoolInitialSize,
+                spawnPeriod: config.AsteroidSpawnPeriod,
+                createView: () => Object.Instantiate(config.AsteroidPrefab),
                 createInit: createInit,
                 getView: init => init.view,
                 getPosition: _ => screenBoundsChecker.RandomPositionInsideBounds,
                 data: Unit._
             );
             _miniAsteroidPool = new(
-                poolInitialSize: gameConfig.PoolInitialSize,
-                createView: () => Object.Instantiate(gameConfig.AsteroidPrefab),
+                poolInitialSize: config.AsteroidPoolInitialSize,
+                createView: () => Object.Instantiate(config.AsteroidPrefab),
                 createInit: createInitForAsteroidMini,
                 getPosition: data => data.position,
                 getView: init => init.view
             );
 
             Asteroid createInit(AsteroidView view, Unit _) {
-                // var randomPos = new Vector3(
-                //     Random.Range(screenBoundsChecker.leftBottomFieldWorldPos.x, screenBoundsChecker.rightTopFieldWorldPos.x),
-                //     Random.Range(screenBoundsChecker.leftBottomFieldWorldPos.y, screenBoundsChecker.rightTopFieldWorldPos.y),
-                //     0f
-                // );
-                var movementVector = Random.insideUnitCircle.normalized * gameConfig.AsteroidSpeed;
+                var movementVector = Random.insideUnitCircle.normalized * config.AsteroidSpeed;
 
                 return new Asteroid(
-                    view, movementVector, gameConfig.AsteroidScale, eventDispatcher, 
-                    screenBoundsChecker, gameConfig
+                    view, movementVector, config.AsteroidScale, eventDispatcher, 
+                    screenBoundsChecker
                 );
             }
 
             AsteroidMini createInitForAsteroidMini(AsteroidView view, AsteroidMiniData data) {
                 return new AsteroidMini(
-                    view, data.movementVector, gameConfig.AsteroidMiniScale, eventDispatcher, 
-                    screenBoundsChecker, gameConfig
+                    view, data.movementVector, config.AsteroidMiniScale, eventDispatcher, 
+                    screenBoundsChecker
                 );
             }
         }
@@ -72,10 +67,10 @@ namespace Asteroids.Game {
 
             // We can split asteroids only using projectiles
             if (weaponType == AsteroidView.PlayerWeaponType.Projectile) {
-                for (var i = 0; i < _gameConfig.AsteroidMinisPerAsteroid; ++i) {
+                for (var i = 0; i < _asteroidConfig.AsteroidMinisPerAsteroid; ++i) {
                     _miniAsteroidPool.SpawnObject(new(
                         position: asteroid.Position,
-                        movementVector: Random.insideUnitCircle.normalized * _gameConfig.AsteroidMiniSpeed
+                        movementVector: Random.insideUnitCircle.normalized * _asteroidConfig.AsteroidMiniSpeed
                     ));
                 }
             }

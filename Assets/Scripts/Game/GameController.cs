@@ -13,8 +13,6 @@ namespace Asteroids.Game {
 
     // TODO KV: maybe add logger as well?
     public class GameController : IUIPlayerDataModel {
-        readonly GameConfigSO _gameConfig;
-        readonly GameEventDispatcher _eventDispatcher;
         readonly ScreenBoundsChecker _screenBoundsChecker;
         readonly ScoreCounter _scoreCounter;
         readonly InGameControllers _inGameControllers;
@@ -36,26 +34,25 @@ namespace Asteroids.Game {
             }
         }
 
-        public GameController(GameConfigSO gameConfig, Camera mainCamera, GameEventDispatcher gameEventDispatcher) {
-            _gameConfig = gameConfig;
-            _eventDispatcher = gameEventDispatcher;
+        public GameController(GameConfigSO gameConfig, Camera mainCamera, GameEventDispatcher eventDispatcher) {
             _screenBoundsChecker = new ScreenBoundsChecker(
                 mainCamera, 
                 screenBoundsThreshold: gameConfig.ScreenBoundsThreshold, 
                 teleportThresholdForScreenBounds: gameConfig.TeleportPositionForScreenBounds
             );
-            _scoreCounter = new ScoreCounter(_eventDispatcher);
+            _scoreCounter = new ScoreCounter(eventDispatcher, gameConfig);
 
-            var playerController = new PlayerController(_gameConfig, _eventDispatcher, _screenBoundsChecker);
+            var playerCollisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
+
+            var playerController = new PlayerController(gameConfig, eventDispatcher, _screenBoundsChecker, playerCollisionMask);
             _inGameControllers = new InGameControllers(
                 playerController,
-                new AsteroidController(_gameConfig, _eventDispatcher, _screenBoundsChecker),
-                new EnemyController(_gameConfig, _eventDispatcher, _screenBoundsChecker, playerController)
+                new AsteroidController(gameConfig, eventDispatcher, _screenBoundsChecker),
+                new EnemyController(gameConfig, eventDispatcher, _screenBoundsChecker, playerController)
             );
 
-            // TODO KV: Subscribe on StartGame? Or remove it
-            _eventDispatcher.Subscribe(SimpleGameEvent.GameStarted, StartGame);
-            _eventDispatcher.Subscribe(SimpleGameEvent.GameFinished, FinishGame);
+            eventDispatcher.Subscribe(SimpleGameEvent.GameStarted, StartGame);
+            eventDispatcher.Subscribe(SimpleGameEvent.GameFinished, FinishGame);
         }
 
         public void OnUpdate(float deltaTime) => _gameUpdate?.Invoke(deltaTime);

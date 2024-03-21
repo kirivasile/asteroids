@@ -11,13 +11,13 @@ namespace Asteroids.Game {
         public readonly EnemyView view;
         readonly float _speed;
 
-        public Enemy(EnemyView view, IGameEventEmitter eventDispatcher, float speed, GameConfigSO gameConfig) {
+        public Enemy(EnemyView view, IGameEventEmitter eventDispatcher, float speed) {
             this.view = view;
             _speed = speed;
 
             view.onCollisionWithPlayerWeapon += () => {
                 eventDispatcher.PushEnemyDestroyed(this);
-                eventDispatcher.PushPlayerScored(gameConfig.EnemyScore);
+                eventDispatcher.PushPlayerScored(ScoreType.Enemy);
             };
         }
 

@@ -11,7 +11,7 @@ namespace Asteroids.Game {
     }
 
     public class PlayerController : IPlayerPositionSubscription {
-        readonly GameConfigSO _gameConfig;
+        readonly IPlayerConfig _config;
         readonly Player _player;
 
         readonly PlayerMovementController _playerMovement;
@@ -29,19 +29,21 @@ namespace Asteroids.Game {
             laserRechargeTimer: _laserShooting.LaserRechargeTimer
         );
 
-        public PlayerController(GameConfigSO gameConfig, IGameEventEmitter gameEventDispatcher, ScreenBoundsChecker screenBoundsChecker) {
-            _gameConfig = gameConfig;
+        public PlayerController(
+            IPlayerConfig config, IGameEventEmitter gameEventDispatcher, ScreenBoundsChecker screenBoundsChecker, LayerMask collisionLayerMask
+        ) {
+            _config = config;
 
-            var view = UnityEngine.Object.Instantiate(_gameConfig.PlayerPrefab, gameConfig.PlayerStartPosition, Quaternion.identity);
+            var view = UnityEngine.Object.Instantiate(_config.PlayerPrefab, config.PlayerStartPosition, Quaternion.identity);
             view.gameObject.SetActive(false);
 
-            var player = new Player(view, gameConfig, screenBoundsChecker);
+            var player = new Player(view, playerMovementConfig: config, laserConfig: config, screenBoundsChecker);
             _player = player;
 
-            _playerMovement = new PlayerMovementController(player, gameConfig);
-            _mainShooting = new ProjectileShootingController(_gameConfig, player);
-            _laserShooting = new LaserShootingController(_gameConfig, player);
-            _collisionDetector = new PlayerCollisionDetector(player, _playerMovement, gameEventDispatcher, _gameConfig);
+            _playerMovement = new PlayerMovementController(player, config);
+            _mainShooting = new ProjectileShootingController(player, shootingConfig: config, collisionLayerMask);
+            _laserShooting = new LaserShootingController(player, config, collisionLayerMask);
+            _collisionDetector = new PlayerCollisionDetector(player, _playerMovement, gameEventDispatcher, config, collisionLayerMask);
         }
 
         public void OnUpdate(float deltaTime) {

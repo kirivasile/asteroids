@@ -6,7 +6,7 @@ using Asteroids.Views;
 
 namespace Asteroids.Game {
     public class LaserShootingController {
-        readonly GameConfigSO _gameConfig;
+        readonly ILaserConfig _gameConfig;
         readonly ILaserWeapon _player;
         readonly LayerMask _collisionLayerMask;
         readonly int _laserMaxCharges;
@@ -34,13 +34,13 @@ namespace Asteroids.Game {
             }
         }
 
-        public LaserShootingController(GameConfigSO gameConfig, ILaserWeapon player) {
-            _gameConfig = gameConfig;
+        public LaserShootingController(ILaserWeapon player, ILaserConfig laserConfig, LayerMask collisionLayerMask) {
+            _gameConfig = laserConfig;
             _player = player;
 
-            _collisionLayerMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
-            _laserNumCharges = gameConfig.LaserStartCharges;
-            _laserMaxCharges = gameConfig.LaserStartCharges;
+            _collisionLayerMask = collisionLayerMask;
+            _laserNumCharges = laserConfig.LaserStartCharges;
+            _laserMaxCharges = laserConfig.LaserStartCharges;
         }
 
         public void OnUpdate() {

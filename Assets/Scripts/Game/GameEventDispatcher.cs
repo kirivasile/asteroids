@@ -6,6 +6,8 @@ namespace Asteroids.Game {
     // TODO KV: docme
     public enum SimpleGameEvent { GameStarted = 0, GameFinished = 1 }
 
+    public enum ScoreType { Asteroid = 0, MiniAsteroid = 1, Enemy = 2}
+
     public interface IGameEventSubscriber {
         void Subscribe(SimpleGameEvent evt, Action callback);
         void UnSubscribe(SimpleGameEvent evt, Action callback);
@@ -13,7 +15,7 @@ namespace Asteroids.Game {
         event Action<Asteroid, AsteroidView.PlayerWeaponType> AsteroidDestroyed;
         event Action<AsteroidMini> MiniAsteroidDestroyed;
         event Action<Enemy> EnemyDestroyed;
-        event Action<int> PlayerScored;
+        event Action<ScoreType> PlayerScored;
         event Action<int> ScoreChanged;
     }
 
@@ -23,7 +25,7 @@ namespace Asteroids.Game {
         void PushAsteroidDestroyed(Asteroid asteroid, AsteroidView.PlayerWeaponType weaponType);
         void PushAsteroidMiniDestroyed(AsteroidMini asteroid);
         void PushEnemyDestroyed(Enemy enemy);
-        void PushPlayerScored(int score);
+        void PushPlayerScored(ScoreType type);
         void PushScoreChanged(int score);
 
         // void ClearAllSubscriptions();
@@ -39,7 +41,7 @@ namespace Asteroids.Game {
         event Action<AsteroidMini> _miniAsteroidDestroyed;
         event Action<Enemy> _enemyDestroyed;
 
-        event Action<int> _playerScored;
+        event Action<ScoreType> _playerScored;
         // TODO KV: remove
         event Action<int> _scoreChanged;
 
@@ -66,7 +68,7 @@ namespace Asteroids.Game {
             remove => _asteroidDestroyed -= value;
         }
 
-        public event Action<int> PlayerScored {
+        public event Action<ScoreType> PlayerScored {
             add => _playerScored += value;
             remove => _playerScored -= value;
         }
@@ -87,7 +89,7 @@ namespace Asteroids.Game {
 
         public void PushScoreChanged(int score) => _scoreChanged?.Invoke(score);
 
-        public void PushPlayerScored(int score) => _playerScored?.Invoke(score);
+        public void PushPlayerScored(ScoreType type) => _playerScored?.Invoke(type);
 
         // TODO KV: check usages
         // public void ClearAllSubscriptions() {

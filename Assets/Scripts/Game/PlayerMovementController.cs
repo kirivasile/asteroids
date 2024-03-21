@@ -15,23 +15,23 @@ namespace Asteroids.Game {
 
     public class PlayerMovementController : IPlayerSpeedSubscription {
         readonly IMovablePlayer _player;
-        readonly GameConfigSO _gameConfig;
+        readonly IPlayerMovementConfig _config;
 
         // TODO KV: docme
         float _currentSpeed;
 
         public float CurrentSpeed => _currentSpeed;
 
-        public PlayerMovementController(IMovablePlayer player, GameConfigSO gameConfig) {
+        public PlayerMovementController(IMovablePlayer player, IPlayerMovementConfig config) {
             _player = player;
-            _gameConfig = gameConfig;
+            _config = config;
         }
 
         public void OnUpdate(float deltaTime) {
-            var rotationProof = HandleRotationInput(rotationInput: _gameConfig.RotateAction.ReadValue<float>(), rotateSpeed: _gameConfig.PlayerRotateSpeed);
+            var rotationProof = HandleRotationInput(rotationInput: _config.RotateAction.ReadValue<float>(), rotateSpeed: _config.PlayerRotateSpeed);
             var forwardMovementProof = HandleMovementInput(
-                movementInput: _gameConfig.MoveAction.ReadValue<float>(), currentSpeed: _currentSpeed, maxSpeed: _gameConfig.PlayerMaxSpeed,
-                playerAcceleration: _gameConfig.PlayerForwardAcceleration, playerDeceleration: _gameConfig.PlayerDeceleration, 
+                movementInput: _config.MoveAction.ReadValue<float>(), currentSpeed: _currentSpeed, maxSpeed: _config.PlayerMaxSpeed,
+                playerAcceleration: _config.PlayerForwardAcceleration, playerDeceleration: _config.PlayerDeceleration, 
                 playerForwardVector: _player.ForwardVector, deltaTime: deltaTime
             );
             UpdatePlayerPositionAndRotation(_player, rotationProof, forwardMovementProof);
@@ -63,13 +63,15 @@ namespace Asteroids.Game {
         }
 
         public void Enable() {
-            _gameConfig.RotateAction.Enable();
-            _gameConfig.MoveAction.Enable();
+            _config.RotateAction.Enable();
+            _config.MoveAction.Enable();
         }
 
         public void Disable() {
-            _gameConfig.RotateAction.Disable();
-            _gameConfig.MoveAction.Disable();
+            _currentSpeed = 0f;
+
+            _config.RotateAction.Disable();
+            _config.MoveAction.Disable();
         }
 
         // TODO KV: docme
