@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 using Asteroids.Game;
 using Asteroids.UI;
@@ -16,7 +15,7 @@ namespace Asteroids.Core {
         [SerializeField] Camera _mainCamera;
 
         GameController _gameController;
-        UIController _uiController;
+        UIController _uiController; 
         GameEventDispatcher _gameEventDispatcher;
 
         event Action<float> _onUpdate;
