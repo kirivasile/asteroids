@@ -64,8 +64,6 @@ namespace Asteroids.Configs {
     }
 
     [CreateAssetMenu(fileName = "Game Config", menuName = "ScriptableObjects/GameConfig", order = 1)]
-    // TODO KV: Maybe extract public variables into interfaces?
-    // TODO KV: Change to
     public class GameConfigSO : 
         ScriptableObject, IPlayerConfig, IScreenBoundsConfig, IAsteroidConfig, IEnemyConfig, IScoreConfig 
     {

@@ -11,7 +11,6 @@ namespace Asteroids.Utils {
         public GameObjectPool(int poolInitialSize, Func<T> createFunction) {
             _createFunction = createFunction;
 
-            // TODO KV: Check if 0 is ok
             _pool = new Stack<T>(poolInitialSize);
 
             for (var i = 0; i < poolInitialSize; ++i) {

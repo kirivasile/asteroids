@@ -1,7 +1,6 @@
 using UnityEngine;
 
 namespace Asteroids.Game {
-    // TODO KV: do we need interface?
     public interface IPlayerUIData {
         Vector2 PlayerPosition { get; }
         float PlayerRotation { get; }

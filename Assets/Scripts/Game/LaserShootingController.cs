@@ -82,8 +82,8 @@ namespace Asteroids.Game {
 
         public void Enable() {
             _gameConfig.LaserShootAction.Enable();
-            // TODO KV: try with removing this line
             _gameConfig.LaserShootAction.performed += ctx => ShootWithLaser();
+
             _laserNumCharges = _gameConfig.LaserStartCharges;
             _lastLaserRechargeHappened = None._;
             _lastLaserShootStarted = None._;

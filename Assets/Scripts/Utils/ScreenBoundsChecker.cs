@@ -6,8 +6,8 @@ namespace Asteroids.Utils {
         readonly float _screenBoundsThreshold;
         readonly float _teleportThresholdForScreenBounds;
 
-        // TODO KV: docme
-        readonly Vector3 _leftBottomFieldWorldPos, _rightTopFieldWorldPos;
+        // These two varaibles describe the borders of the screen/camera in world space.
+        readonly Vector2 _leftBottomFieldWorldPos, _rightTopFieldWorldPos;
 
         public ScreenBoundsChecker(Camera mainCamera, float screenBoundsThreshold, float teleportThresholdForScreenBounds) {
             _mainCamera = mainCamera;
@@ -15,22 +15,21 @@ namespace Asteroids.Utils {
             _teleportThresholdForScreenBounds = teleportThresholdForScreenBounds;
 
             var cameraAspect = mainCamera.aspect;
-            var bottomLeftViewportPos = new Vector3(
+            var bottomLeftViewportPos = new Vector2(
                 screenBoundsThreshold / cameraAspect,
-                screenBoundsThreshold,
-                10f // TODO KV: Change for 0f
+                screenBoundsThreshold
             );
-            var topRightViewportPos = new Vector3(
+            var topRightViewportPos = new Vector2(
                 1f - screenBoundsThreshold / cameraAspect,
-                1f - screenBoundsThreshold,
-                10f // TODO KV: Change for 0f
+                1f - screenBoundsThreshold
             );
 
             _leftBottomFieldWorldPos = mainCamera.ViewportToWorldPoint(bottomLeftViewportPos);
             _rightTopFieldWorldPos = mainCamera.ViewportToWorldPoint(topRightViewportPos);
         }
 
-        // TODO KV: docme
+        // If the `position` is outside of screen bounds, the method calculates and returns new position within the screen bounds.
+        // e.g. If the point is near the left border of the screen, it will get the position near the right border of the screen.
         public Vector3 WrapScreenBounds(Vector3 position) {
             var playerScreenPos = _mainCamera.WorldToViewportPoint(position);
 
@@ -53,6 +52,7 @@ namespace Asteroids.Utils {
             return _mainCamera.ViewportToWorldPoint(newPlayerScreenPos);
         }
 
+        // Get random position within the screen
         public Vector3 RandomPositionInsideBounds => new Vector3(
             Random.Range(_leftBottomFieldWorldPos.x, _rightTopFieldWorldPos.x),
             Random.Range(_leftBottomFieldWorldPos.y, _rightTopFieldWorldPos.y),

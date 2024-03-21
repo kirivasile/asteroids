@@ -1,10 +1,7 @@
 using UnityEngine;
 
 namespace Asteroids.Views {
-    // TODO KV: Maybe better split views and logic?
     public class PlayerView : MonoBehaviour {
-        public static string TAG = "Player";
-
         [SerializeField] LineRenderer _laser;
 
         public bool LaserIsActive {

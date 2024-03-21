@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
 using UnityEngine;
 
 namespace Asteroids.Game {
-    // TODO KV: Maybe try to return to explicit implementation
     public interface IPlayerWithPosition {
         Vector3 Position { get; }
         float Rotation { get; }
@@ -27,7 +23,6 @@ namespace Asteroids.Game {
         Vector3 LaserEndPosition { get; }
     }
 
-    // TODO KV: Do I even need Init class?
     public class Player : ILaserWeapon, IMovablePlayer {
         readonly PlayerView _view;
         readonly ScreenBoundsChecker _screenBoundsChecker;

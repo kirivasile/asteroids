@@ -1,17 +1,10 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Codice.Client.BaseCommands;
-using UnityEngine;
 
-// TODO KV: check if needed
 namespace Asteroids.Utils {
     // Custom simple implementation of the optional type
     public struct Option<T> {
         public static Option<T> Some(T value) => new Option<T>(value);
-        // public static Option<T> None = default;
 
-        // TODO KV: check if needed
         public static implicit operator Option<T>(None none) => default;
 
         private readonly bool _isSome;
@@ -30,9 +23,9 @@ namespace Asteroids.Utils {
         public bool IsSome => _isSome;
         public bool IsNone => !_isSome;
 
-        // TODO KV: check usages
-        // public Option<U> Map<U>(Func<T, U> mapper) => 
-        //     _isSome ? new Option<U>(mapper(_unsafeValue)) : None._;
+        // Convertes `Option<T>` to `Option<U>` with provided `mapper`
+        public Option<U> Map<U>(Func<T, U> mapper) => 
+            _isSome ? new Option<U>(mapper(_unsafeValue)) : None._;
     }
 
     public struct None {
@@ -44,9 +37,10 @@ namespace Asteroids.Utils {
         public static Option<T> _<T>(T value) => Option<T>.Some(value);
     }
 
-    // public static class BoolExts {
-    //     public static Option<T> ToOptionLazy<T>(this bool flag, Func<T> value) => flag ? Some._(value()) : None._;
-    // }
+    public static class BoolExts {
+        // Allows you to construct `Option` base on the boolean value `flag`
+        public static Option<T> ToOption<T>(this bool flag, T value) => flag ? Some._(value) : None._;
+    }
 
     // public static class OptionExts {
     //     // public static Option<U> Upcast<T, U>(this Option<T> opt) where T: U => opt.Map<U>(t => t);

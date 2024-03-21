@@ -1,6 +1,5 @@
 using System;
 using Asteroids.Configs;
-using Asteroids.Views;
 
 namespace Asteroids.Game {
     public interface IScoreCounter {
@@ -8,15 +7,13 @@ namespace Asteroids.Game {
     }
 
     public class ScoreCounter : IScoreCounter {
-        readonly GameEventDispatcher _gameEventDispatcher;
         readonly IScoreConfig _scoreConfig;
 
         int _score;
 
         int IScoreCounter.Score => _score;
 
-        public ScoreCounter(GameEventDispatcher gameEventDispatcher, IScoreConfig scoreConfig) {
-            _gameEventDispatcher = gameEventDispatcher;
+        public ScoreCounter(IGameEventSubscriber gameEventDispatcher, IScoreConfig scoreConfig) {
             _scoreConfig = scoreConfig;
 
             gameEventDispatcher.PlayerScored += OnPlayerScored;
@@ -26,7 +23,6 @@ namespace Asteroids.Game {
 
         public void Reset() {
             _score = 0;
-            _gameEventDispatcher.PushScoreChanged(0);
         }
 
         void OnPlayerScored(ScoreType type) {
@@ -38,7 +34,6 @@ namespace Asteroids.Game {
                 _ => throw new ArgumentOutOfRangeException()
             };
             _score += score;
-            _gameEventDispatcher.PushScoreChanged(_score);
         } 
     }
 }

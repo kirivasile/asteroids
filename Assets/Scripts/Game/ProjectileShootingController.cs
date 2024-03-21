@@ -3,19 +3,18 @@ using UnityEngine;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
-using System;
 
 namespace Asteroids.Game {
-    // TODO KV: Maybe delete all explicit interface implementation
     using ProjectileViewPool = PooledObjectsOnEvent<ProjectileView, Projectile, Vector3>;
 
     public class ProjectileShootingController {
         readonly IShootingConfig _config;
         readonly ProjectileViewPool _projectilePool;
-        // TODO KV: docme
-        readonly List<Projectile> _projectilesToDisableBuf;
         readonly IPlayerWithPosition _player;
         readonly LayerMask _collisionLayerMask;
+
+        // Buffer to collect all the projectiles to delete expired or destroyed projectiles during the frame.
+        readonly List<Projectile> _projectilesToDisableBuf;
 
         public ProjectileShootingController(IPlayerWithPosition player, IShootingConfig shootingConfig, LayerMask collisionMask) {
             _config = shootingConfig;
@@ -24,13 +23,12 @@ namespace Asteroids.Game {
 
             _projectilePool = new(
                 poolInitialSize: shootingConfig.ProjectilePoolInitialSize,
-                createView: () => UnityEngine.Object.Instantiate(_config.PlayerShootingProjectile),
+                createView: () => Object.Instantiate(_config.PlayerShootingProjectile),
                 createInit: createInit,
                 getView: init => init.view,
                 getPosition: data => data
             );
             _projectilesToDisableBuf = new();
-            // _collisionLayerMask = 1 << config.AsteroidPrefab.gameObject.layer | 1 << config.EnemyPrefab.gameObject.layer;
 
             Projectile createInit(ProjectileView view, Vector3 position) {
                 return new Projectile(

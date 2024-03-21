@@ -24,15 +24,11 @@ namespace Asteroids.Game {
         
         public IScoreCounter ScoreCounter => _scoreCounter;
 
-        // Option<IPlayerUIData> IUIPlayerDataModel.PlayerData => _maybeInGameControllers.Map(_ => _.playerController.PlayerData);
-        // TODO KV: docme
-        // TODO KV: change for BoolExts.ToOption
-        Option<IPlayerUIData> IUIPlayerDataModel.PlayerData {
-            get {
-                if (_isGameRunning) return Some._(_inGameControllers.playerController.PlayerData);
-                else return None._;
-            }
-        }
+        // Get the player data to display at the UI. If the value is `None`, then the game is not running.
+        Option<IPlayerUIData> IUIPlayerDataModel.PlayerData => 
+            _isGameRunning
+                .ToOption(_inGameControllers.playerController)
+                .Map(static playerController => playerController.PlayerData); // Prevent `PlayerData` calculation when the `_isGameRunning == false`
 
         public GameController(GameConfigSO gameConfig, Camera mainCamera, GameEventDispatcher eventDispatcher) {
             _screenBoundsChecker = new ScreenBoundsChecker(
@@ -42,6 +38,7 @@ namespace Asteroids.Game {
             );
             _scoreCounter = new ScoreCounter(eventDispatcher, gameConfig);
 
+            // Collision mask for the player. It and its weapons can only interact with the asteroids or enemies.
             var playerCollisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
 
             var playerController = new PlayerController(gameConfig, eventDispatcher, _screenBoundsChecker, playerCollisionMask);

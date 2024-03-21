@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Asteroids.Views;
 
@@ -16,7 +13,6 @@ namespace Asteroids.Game {
 
         readonly float _collisionRadius;
 
-        // TODO KV: docme
         readonly LayerMask _collisionLayerMask;
         readonly float _speed;
 

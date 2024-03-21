@@ -1,11 +1,6 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Utilities;
-using UnityEngine.InputSystem.Interactions;
-using UnityEngine.InputSystem.Controls;
 using Asteroids.Configs;
 using Asteroids.Utils;
-using System;
 
 namespace Asteroids.Game {
     // Can be done with delegates as well. 
@@ -17,10 +12,7 @@ namespace Asteroids.Game {
         readonly IMovablePlayer _player;
         readonly IPlayerMovementConfig _config;
 
-        // TODO KV: docme
-        float _currentSpeed;
-
-        public float CurrentSpeed => _currentSpeed;
+        public float CurrentSpeed { get; private set; }
 
         public PlayerMovementController(IMovablePlayer player, IPlayerMovementConfig config) {
             _player = player;
@@ -30,16 +22,16 @@ namespace Asteroids.Game {
         public void OnUpdate(float deltaTime) {
             var rotationProof = HandleRotationInput(rotationInput: _config.RotateAction.ReadValue<float>(), rotateSpeed: _config.PlayerRotateSpeed);
             var forwardMovementProof = HandleMovementInput(
-                movementInput: _config.MoveAction.ReadValue<float>(), currentSpeed: _currentSpeed, maxSpeed: _config.PlayerMaxSpeed,
+                movementInput: _config.MoveAction.ReadValue<float>(), currentSpeed: CurrentSpeed, maxSpeed: _config.PlayerMaxSpeed,
                 playerAcceleration: _config.PlayerForwardAcceleration, playerDeceleration: _config.PlayerDeceleration, 
                 playerForwardVector: _player.ForwardVector, deltaTime: deltaTime
             );
             UpdatePlayerPositionAndRotation(_player, rotationProof, forwardMovementProof);
 
-            _currentSpeed = forwardMovementProof.movementSpeed;
+            CurrentSpeed = forwardMovementProof.movementSpeed;
         }
 
-        // TODO KV: docme
+        
         static RotationInputHandledProof HandleRotationInput(float rotationInput, float rotateSpeed) {
             return new RotationInputHandledProof(rotationInput * rotateSpeed);
         }
@@ -68,13 +60,14 @@ namespace Asteroids.Game {
         }
 
         public void Disable() {
-            _currentSpeed = 0f;
+            CurrentSpeed = 0f;
 
             _config.RotateAction.Disable();
             _config.MoveAction.Disable();
         }
 
-        // TODO KV: docme
+        // Set of structs, which enforce the correct order of the operations in `Update` methods.
+        // At first we calculate new values and only then we use them to update the views.
         readonly struct MovementInputHandledProof{
             public readonly Vector3 movementVector;
             public readonly float movementSpeed;

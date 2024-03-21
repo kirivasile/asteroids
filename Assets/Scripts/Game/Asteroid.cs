@@ -15,10 +15,6 @@ namespace Asteroids.Game {
 
         public Vector3 Position => view.transform.position;
 
-        // TODO KV: Don't like this flag
-        // The flag is used to prevent 
-        protected bool _isEnabled;
-
         public AsteroidBase(AsteroidView view, Vector3 movementVector, float scale, ScreenBoundsChecker screenBoundsChecker) {
             this.view = view;
 
@@ -26,8 +22,6 @@ namespace Asteroids.Game {
 
             _movementVector = movementVector;
             _screenBoundsChecker = screenBoundsChecker;
-
-            _isEnabled = true;
         }
 
         // Some of the asteroids get several calls during one update. When other is more rare
