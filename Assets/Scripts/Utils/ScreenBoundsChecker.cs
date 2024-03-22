@@ -1,6 +1,8 @@
 using UnityEngine;
 
 namespace Asteroids.Utils {
+    // Class that implements `wrapped` game field.
+    // Where player and objects can leave the camera on one side and return from the opposite one.
     public class ScreenBoundsChecker {
         readonly Camera _mainCamera;
         readonly float _screenBoundsThreshold;

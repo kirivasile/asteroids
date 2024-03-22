@@ -1,11 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Asteroids.UI {
+    // UI before the the game starts.
     public class PreStartView : MonoBehaviour, IScreenView {
         [SerializeField] Canvas _canvas;
         [SerializeField] Button _startGame;

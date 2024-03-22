@@ -2,6 +2,7 @@ using UnityEngine;
 using Asteroids.Views;
 
 namespace Asteroids.Game {
+    // Class containg the logic of the projectiles, that player shoots.
     public class Projectile {
         public readonly ProjectileView view;
 

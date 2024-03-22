@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Asteroids.Views;
@@ -17,22 +16,20 @@ namespace Asteroids.Configs {
     }
 
     public interface IShootingConfig {
-        ProjectileView PlayerShootingProjectile { get; }
-        InputAction MainShootAction { get; }
+        ProjectileView Projectile { get; }
+        InputAction ShootAction { get; }
         float ProjectileSpeed { get; }
         float ProjectileLifeDuration { get; }
         int ProjectilePoolInitialSize { get; }
     }
 
     public interface ILaserConfig {
-        InputAction LaserShootAction { get; }
+        InputAction ShootAction { get; }
         float LaserDuration { get; }
         float LaserLength { get; }
         float LaserChargeCooldown { get; }
         int LaserStartCharges { get; }
     }
-
-    public interface IPlayerConfig : IPlayerMovementConfig, IShootingConfig, ILaserConfig { }
 
     public interface IAsteroidConfig {
         AsteroidView AsteroidPrefab { get; }
@@ -64,66 +61,34 @@ namespace Asteroids.Configs {
     }
 
     [CreateAssetMenu(fileName = "Game Config", menuName = "ScriptableObjects/GameConfig", order = 1)]
-    public class GameConfigSO : 
-        ScriptableObject, IPlayerConfig, IScreenBoundsConfig, IAsteroidConfig, IEnemyConfig, IScoreConfig 
-    {
-        [Header("Prefabs")]
-        [SerializeField] PlayerView _playerPrefab;
-        [SerializeField] EnemyView _enemyPrefab;
-        [SerializeField] AsteroidView _asteroidPrefab;
-        [SerializeField] ProjectileView _playerShootingProjectile;
+    public class GameConfigSO : ScriptableObject {
+        [SerializeField] PlayerMovementConfigSO _playerMovementConfig;
+        [SerializeField] ShootingConfigSO _shootingConfig;
+        [SerializeField] LaserConfigSO _laserConfig;
+        [SerializeField] AsteroidConfigSO _asteroidConfig;
+        [SerializeField] EnemyConfigSO _enemyConfig;
+        [SerializeField] ScoreConfigSO _scoreConfig;     
+        [SerializeField] ScreenBoundsConfigSO _screenBoundsConfig;
 
-        [Header("Player")]
+        public PlayerMovementConfigSO PlayerMovementConfig => _playerMovementConfig;
+        public ShootingConfigSO ShootingConfig => _shootingConfig;
+        public LaserConfigSO LaserConfig => _laserConfig;
+        public AsteroidConfigSO AsteroidConfig => _asteroidConfig;
+        public EnemyConfigSO EnemyConfig => _enemyConfig;
+        public ScoreConfigSO ScoreConfig => _scoreConfig;
+        public ScreenBoundsConfigSO ScreenBoundsConfig => _screenBoundsConfig;
+    }
+
+    [Serializable]
+    public class PlayerMovementConfigSO : IPlayerMovementConfig {
+        [SerializeField] PlayerView _playerPrefab;
+        [SerializeField] InputAction _rotateAction;
+        [SerializeField] InputAction _moveAction;
         [SerializeField] Vector2 _playerStartPosition;
         [SerializeField] float _playerForwardAcceleration;
         [SerializeField] float _playerDeceleration;
         [SerializeField] float _playerRotateSpeed;
         [SerializeField] float _playerMaxSpeed;
-
-        [Header("Input")]
-        [SerializeField] InputAction _rotateAction;
-        [SerializeField] InputAction _moveAction;
-        [SerializeField] InputAction _mainShootAction;
-        [SerializeField] InputAction _laserShootAction;
-
-        [Header("Screen bounds")]
-        // Sets the distance from the borders of the screen, where the entity will be teleported to another border.
-        [SerializeField, Range(0f, 0.2f)] float _screenBoundsThreshold;
-        // Set the distance from the borders of the screen, where the entities will be teleported.
-        // This value should be greater than `_screenBoundsThreshold`
-        [SerializeField, Range(0f, 0.2f)] float _teleportPositionForScreenBounds;
-
-        [Header("Projectiles")]
-        [SerializeField] float _projectileSpeed;
-        [SerializeField] int _projectileLifeDuration;
-        [SerializeField] int _projectilePoolInitialSize;
-
-        [Header("Asteroids")]
-        [SerializeField] float _asteroidSpawnPeriod;
-        [SerializeField] float _asteroidSpeed;
-        [SerializeField] float _asteroidScale;
-        [SerializeField] int _asteroidPoolInitialSize;
-
-        [Header("Mini-asteroids")]
-        [SerializeField] int _miniAsteroidsPerAsteroid;
-        [SerializeField] float _miniAsteroidSpeed;
-        [SerializeField] float _miniAsteroidScale;
-
-        [Header("Laser")]
-        [SerializeField] float _laserDuration;
-        [SerializeField] float _laserLength;
-        [SerializeField] float _laserChargeCooldown;
-        [SerializeField] int _laserStartCharges;
-
-        [Header("Enemies")]
-        [SerializeField] float _enemySpawnPeriod;
-        [SerializeField] float _enemySpeed;
-        [SerializeField] int _enemyPoolInitialSize;
-
-        [Header("Scores")]
-        [SerializeField] int _asteroidScore;
-        [SerializeField] int _miniAsteroidScore;
-        [SerializeField] int _enemyScore;
 
         public PlayerView PlayerPrefab => _playerPrefab;
         public InputAction RotateAction => _rotateAction;
@@ -133,18 +98,48 @@ namespace Asteroids.Configs {
         public float PlayerDeceleration => _playerDeceleration;
         public float PlayerRotateSpeed => _playerRotateSpeed;
         public float PlayerMaxSpeed => _playerMaxSpeed;
+    }
 
-        public InputAction MainShootAction => _mainShootAction;
-        public ProjectileView PlayerShootingProjectile => _playerShootingProjectile;
+    [Serializable]
+    public class ShootingConfigSO : IShootingConfig {
+        [SerializeField] ProjectileView _projectile;
+        [SerializeField] InputAction _shootAction;
+        [SerializeField] float _projectileSpeed;
+        [SerializeField] int _projectileLifeDuration;
+        [SerializeField] int _projectilePoolInitialSize;
+
+        public ProjectileView Projectile => _projectile;
+        public InputAction ShootAction => _shootAction;
         public float ProjectileSpeed => _projectileSpeed;
         public float ProjectileLifeDuration => _projectileLifeDuration;
         public int ProjectilePoolInitialSize => _projectilePoolInitialSize;
+    }
 
-        public InputAction LaserShootAction => _laserShootAction;
+    [Serializable]
+    public class LaserConfigSO : ILaserConfig {
+        [SerializeField] InputAction _shootAction;
+        [SerializeField] float _laserDuration;
+        [SerializeField] float _laserLength;
+        [SerializeField] float _laserChargeCooldown;
+        [SerializeField] int _laserStartCharges;
+
+        public InputAction ShootAction => _shootAction;
         public float LaserDuration => _laserDuration;
         public float LaserLength => _laserLength;
         public float LaserChargeCooldown => _laserChargeCooldown;
         public int LaserStartCharges => _laserStartCharges;
+    }
+
+    [Serializable]
+    public class AsteroidConfigSO : IAsteroidConfig {
+        [SerializeField] AsteroidView _asteroidPrefab;
+        [SerializeField] float _asteroidSpawnPeriod;
+        [SerializeField] float _asteroidSpeed;
+        [SerializeField] float _asteroidScale;
+        [SerializeField] int _asteroidPoolInitialSize;
+        [SerializeField] int _miniAsteroidsPerAsteroid;
+        [SerializeField] float _miniAsteroidSpeed;
+        [SerializeField] float _miniAsteroidScale;
 
         public AsteroidView AsteroidPrefab => _asteroidPrefab;
         public float AsteroidSpawnPeriod => _asteroidSpawnPeriod;
@@ -154,15 +149,39 @@ namespace Asteroids.Configs {
         public float AsteroidMiniSpeed => _miniAsteroidSpeed;
         public float AsteroidMiniScale => _miniAsteroidScale;
         public int AsteroidPoolInitialSize => _asteroidPoolInitialSize;
+    }
+
+    [Serializable]
+    public class EnemyConfigSO : IEnemyConfig {
+        [SerializeField] EnemyView _enemyPrefab;
+        [SerializeField] float _enemySpawnPeriod;
+        [SerializeField] float _enemySpeed;
+        [SerializeField] int _enemyPoolInitialSize;
 
         public EnemyView EnemyPrefab => _enemyPrefab;
         public float EnemySpawnPeriod => _enemySpawnPeriod;
         public float EnemySpeed => _enemySpeed;
         public int EnemyPoolInitialSize => _enemyPoolInitialSize;
+    }
+
+    [Serializable]
+    public class ScoreConfigSO : IScoreConfig {
+        [SerializeField] int _asteroidScore;
+        [SerializeField] int _miniAsteroidScore;
+        [SerializeField] int _enemyScore;
 
         public int AsteroidScore => _asteroidScore;
         public int MiniAsteroidScore => _miniAsteroidScore;
         public int EnemyScore => _enemyScore;
+    }
+
+    [Serializable]
+    public class ScreenBoundsConfigSO : IScreenBoundsConfig {
+        // Sets the distance from the borders of the screen, where the entity will be teleported to another border.
+        [SerializeField, Range(0f, 0.2f)] float _screenBoundsThreshold;
+        // Set the distance from the borders of the screen, where the entities will be teleported.
+        // This value should be greater than `_screenBoundsThreshold`
+        [SerializeField, Range(0f, 0.2f)] float _teleportPositionForScreenBounds;
 
         public float ScreenBoundsThreshold => _screenBoundsThreshold;
         public float TeleportPositionForScreenBounds => _teleportPositionForScreenBounds;

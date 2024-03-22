@@ -3,6 +3,7 @@ using TMPro;
 using Asteroids.Game;
 
 namespace Asteroids.UI {
+    // In-game UI displaying the player's stats
     public class GameStatusView: MonoBehaviour {
         [SerializeField] TextMeshProUGUI _playerPosition;
         [SerializeField] TextMeshProUGUI _playerRotation;

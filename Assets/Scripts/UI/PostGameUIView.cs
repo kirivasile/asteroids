@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Asteroids.UI {
+    // UI after the game ends. Restart button and the final score.
     public class PostGameUIView : MonoBehaviour, IScreenView {
         [SerializeField] Canvas _canvas;
         [SerializeField] Button _restartGame;

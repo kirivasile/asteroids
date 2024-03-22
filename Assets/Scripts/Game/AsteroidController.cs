@@ -1,8 +1,7 @@
-using System.Collections.Generic;
+using UnityEngine;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
-using UnityEngine;
 
 namespace Asteroids.Game {
     using AsteroidViewPool = PooledObjectsOnTimer<AsteroidView, Asteroid, Unit>;
@@ -62,24 +61,6 @@ namespace Asteroids.Game {
             }
         }
 
-        void DisableAsteroid(Asteroid asteroid, AsteroidView.PlayerWeaponType weaponType) {
-            _asteroidPool.Release(asteroid);
-
-            // We can split asteroids only using projectiles
-            if (weaponType == AsteroidView.PlayerWeaponType.Projectile) {
-                for (var i = 0; i < _asteroidConfig.AsteroidMinisPerAsteroid; ++i) {
-                    _miniAsteroidPool.SpawnObject(new(
-                        position: asteroid.Position,
-                        movementVector: Random.insideUnitCircle.normalized * _asteroidConfig.AsteroidMiniSpeed
-                    ));
-                }
-            }
-        }
-
-        void DisableAsteroidMini(AsteroidMini asteroid) {
-            _miniAsteroidPool.Release(asteroid);
-        }
-
         public void Enable() {
             _asteroidPool.Enable();
 
@@ -94,8 +75,27 @@ namespace Asteroids.Game {
             _asteroidPool.Disable();
             _miniAsteroidPool.Disable();
         }
+
+        void DisableAsteroid(Asteroid asteroid, AsteroidView.PlayerWeaponType weaponType) {
+            _asteroidPool.Release(asteroid);
+
+            // We can split asteroids only using projectiles. Laser destroys asteroids immediately.
+            if (weaponType == AsteroidView.PlayerWeaponType.Projectile) {
+                for (var i = 0; i < _asteroidConfig.AsteroidMinisPerAsteroid; ++i) {
+                    _miniAsteroidPool.SpawnObject(new(
+                        position: asteroid.Position,
+                        movementVector: Random.insideUnitCircle.normalized * _asteroidConfig.AsteroidMiniSpeed
+                    ));
+                }
+            }
+        }
+
+        void DisableAsteroidMini(AsteroidMini asteroid) {
+            _miniAsteroidPool.Release(asteroid);
+        }
     }
 
+    // Container of the initialization data for `AsteroidMini`
     struct AsteroidMiniData {
         public readonly Vector3 position;
         public readonly Vector3 movementVector;

@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Asteroids.Utils {
+    // Simple implementation of the game object pool.
     public class GameObjectPool<T> where T: MonoBehaviour {
         readonly Stack<T> _pool;
         readonly Func<T> _createFunction;

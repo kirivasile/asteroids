@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Asteroids.Views;
 
 namespace Asteroids.Game {
+    // Game events without any data.
     public enum SimpleGameEvent { GameStarted = 0, GameFinished = 1 }
 
     public enum ScoreType { Asteroid = 0, MiniAsteroid = 1, Enemy = 2}
 
+    // Interface providing the methods only to subscribe for the events. Can't push them.
     public interface IGameEventSubscriber {
         void Subscribe(SimpleGameEvent evt, Action callback);
         void UnSubscribe(SimpleGameEvent evt, Action callback);
@@ -17,6 +19,7 @@ namespace Asteroids.Game {
         event Action<ScoreType> PlayerScored;
     }
 
+    // Iterface for pushing the events, can't subscribe on them.
     public interface IGameEventEmitter {
         void Push(SimpleGameEvent evt);
 
@@ -26,6 +29,7 @@ namespace Asteroids.Game {
         void PushPlayerScored(ScoreType type);
     }
 
+    // Simple event dispatcher that hepls to emit and subscribe for the game events.
     public class GameEventDispatcher : IGameEventSubscriber, IGameEventEmitter {
 
         readonly Dictionary<SimpleGameEvent, Action> _simpleEvents;

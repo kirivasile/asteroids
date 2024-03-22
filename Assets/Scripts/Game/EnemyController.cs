@@ -1,11 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
 
 namespace Asteroids.Game {
-    // TODO KV: Make more abstract to use different enemies
+    // Class responsible for the player's enemies logic. One controller for each type of enemy.
     public class EnemyController {
         readonly PooledObjectsOnTimer<EnemyView, Enemy, Unit> _enemyPool;
         readonly IPlayerPositionSubscription _playerPosition;

@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 using Asteroids.Game;
 
 namespace Asteroids.UI {
+    // See `GameStatusView` for more info.
     public class InGameUIView : MonoBehaviour, IScreenView {
         [SerializeField] Canvas _canvas;
         [SerializeField] GameStatusView _gameStatusView;

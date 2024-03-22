@@ -1,9 +1,10 @@
+using UnityEngine;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
-using UnityEngine;
 
 namespace Asteroids.Game {
+    // Interface, that provide only get methods for the player's position and rotation.
     public interface IPlayerWithPosition {
         Vector3 Position { get; }
         float Rotation { get; }
@@ -11,22 +12,24 @@ namespace Asteroids.Game {
         Normalized<Vector3> ForwardVector { get; }
     }
 
+    // Interface, that provides the control for the player's position and rotation.
     public interface IMovablePlayer : IPlayerWithPosition {
         void Rotate(float value);
         void Move(Vector3 movementVector);
         void ResetPosition();
     }
 
+    // Interface for the laser weapon of the player.
     public interface ILaserWeapon {
         bool IsLaserActive { get; set; }
         Vector3 LaserStartPosition { get; }
         Vector3 LaserEndPosition { get; }
     }
 
+    // Class, containg the logic for the player.
     public class Player : ILaserWeapon, IMovablePlayer {
         readonly PlayerView _view;
         readonly ScreenBoundsChecker _screenBoundsChecker;
-        // readonly float _laserLength;
         readonly float _playerCollisionRadius;
         readonly Vector3 _initialPosition;
         readonly float _laserLength;

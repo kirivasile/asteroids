@@ -1,7 +1,7 @@
 using System;
 
 namespace Asteroids.Utils {
-    // Custom simple implementation of the optional type
+    // Custom simple implementation of the optional type.
     public struct Option<T> {
         public static Option<T> Some(T value) => new Option<T>(value);
 
@@ -41,8 +41,4 @@ namespace Asteroids.Utils {
         // Allows you to construct `Option` base on the boolean value `flag`
         public static Option<T> ToOption<T>(this bool flag, T value) => flag ? Some._(value) : None._;
     }
-
-    // public static class OptionExts {
-    //     // public static Option<U> Upcast<T, U>(this Option<T> opt) where T: U => opt.Map<U>(t => t);
-    // }
 }

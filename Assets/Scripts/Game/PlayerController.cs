@@ -1,7 +1,6 @@
 using UnityEngine;
 
 using Asteroids.Configs;
-using Asteroids.Game;
 using Asteroids.Utils;
 using System;
 
@@ -10,64 +9,87 @@ namespace Asteroids.Game {
         Vector3 PlayerPosition { get; }
     }
 
-    public class PlayerController : IPlayerPositionSubscription {
-        readonly IPlayerConfig _config;
+    public interface IUIPlayerDataModel {
+        // Simple analogue to the reactive values.
+        event Action<IPlayerUIData> Observe;
+    }
+
+    // Controller responsible for all the systems connected to the player.
+    public class PlayerController : IPlayerPositionSubscription, IUIPlayerDataModel {
         readonly Player _player;
 
         readonly PlayerMovementController _playerMovement;
-        readonly ProjectileShootingController _mainShooting; // Make more abstract to shoot different projectiles
+        // List of projectile controllers to make it possible to quickly introduce new weapons for the player
+        readonly ProjectileShootingController[] _projectileShootingControllers;
         readonly LaserShootingController _laserShooting;
         readonly PlayerCollisionDetector _collisionDetector;
 
         Vector3 IPlayerPositionSubscription.PlayerPosition => _player.Position;
 
-        public IPlayerUIData PlayerData => new PlayerUIData(
-            playerPosition: _player.Position,
-            playerRotation: _player.Rotation,
-            playerSpeed: _playerMovement.CurrentSpeed,
-            laserCount: _laserShooting.LaserCount,
-            laserRechargeTimer: _laserShooting.LaserRechargeTimer
-        );
+        event Action<IPlayerUIData> _playerDataModelObserver;
+
+        event Action<IPlayerUIData> IUIPlayerDataModel.Observe {
+            add => _playerDataModelObserver += value;
+            remove => _playerDataModelObserver -= value;
+        }
 
         public PlayerController(
-            IPlayerConfig config, IGameEventEmitter gameEventDispatcher, ScreenBoundsChecker screenBoundsChecker, LayerMask collisionLayerMask
+            IPlayerMovementConfig playerMovementConfig, IShootingConfig[] shootingConfigs, ILaserConfig laserConfig, 
+            IGameEventEmitter gameEventDispatcher, ScreenBoundsChecker screenBoundsChecker, LayerMask collisionLayerMask
         ) {
-            _config = config;
-
-            var view = UnityEngine.Object.Instantiate(_config.PlayerPrefab, config.PlayerStartPosition, Quaternion.identity);
+            var view = UnityEngine.Object.Instantiate(
+                playerMovementConfig.PlayerPrefab, playerMovementConfig.PlayerStartPosition, Quaternion.identity
+            );
             view.gameObject.SetActive(false);
 
-            var player = new Player(view, playerMovementConfig: config, laserConfig: config, screenBoundsChecker);
+            var player = new Player(view, playerMovementConfig: playerMovementConfig, laserConfig: laserConfig, screenBoundsChecker);
             _player = player;
 
-            _playerMovement = new PlayerMovementController(player, config);
-            _mainShooting = new ProjectileShootingController(player, shootingConfig: config, collisionLayerMask);
-            _laserShooting = new LaserShootingController(player, config, collisionLayerMask);
-            _collisionDetector = new PlayerCollisionDetector(player, _playerMovement, gameEventDispatcher, config, collisionLayerMask);
+            _playerMovement = new PlayerMovementController(player, playerMovementConfig);
+            _projectileShootingControllers = shootingConfigs.Map(config => new ProjectileShootingController(player, config, collisionLayerMask));
+            _laserShooting = new LaserShootingController(player, laserConfig, collisionLayerMask);
+            _collisionDetector = new PlayerCollisionDetector(player, _playerMovement, gameEventDispatcher, collisionLayerMask);
         }
 
         public void OnUpdate(float deltaTime) {
             _playerMovement.OnUpdate(deltaTime);
-            _mainShooting.OnUpdate(deltaTime);
             _laserShooting.OnUpdate();
             _collisionDetector.OnUpdate(deltaTime);
+
+            foreach (var controller in _projectileShootingControllers) controller.OnUpdate(deltaTime);
+
+            NotifyPlayerDataModelObservers();
+
+            void NotifyPlayerDataModelObservers() {
+                var currentData = new PlayerUIData(
+                    playerPosition: _player.Position,
+                    playerRotation: _player.Rotation,
+                    playerSpeed: _playerMovement.CurrentSpeed,
+                    laserCount: _laserShooting.LaserCount,
+                    laserRechargeTimer: _laserShooting.LaserRechargeTimer
+                );
+
+                _playerDataModelObserver?.Invoke(currentData);
+            }
         }
 
         public void Enable() {
             _player.SetActive(true);
             _player.ResetPosition();
-
             _playerMovement.Enable();
-            _mainShooting.Enable();
             _laserShooting.Enable();
+
+            foreach (var controller in _projectileShootingControllers) controller.Enable();
         }
 
-        // TODO KV: maybe add trackers?
         public void Disable() {
             _player.SetActive(false);
             _playerMovement.Disable();
-            _mainShooting.Disable();
             _laserShooting.Disable();
+
+            foreach (var controller in _projectileShootingControllers) controller.Disable();
         }
+
+        
     }
 }

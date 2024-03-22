@@ -1,51 +1,49 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Asteroids.Configs;
-using Asteroids.Game;
 using Asteroids.Utils;
 using UnityEngine;
 
 namespace Asteroids.Game {
-    public interface IUIPlayerDataModel {
-        Option<IPlayerUIData> PlayerData { get; }
-    }
-
-    // TODO KV: maybe add logger as well?
-    public class GameController : IUIPlayerDataModel {
+    // Class containing the logic for the game.
+    public class GameController {
         readonly ScreenBoundsChecker _screenBoundsChecker;
         readonly ScoreCounter _scoreCounter;
         readonly InGameControllers _inGameControllers;
 
         event Action<float> _gameUpdate;
-
-        // TODO KV: Don't like mutable flag
-        bool _isGameRunning;
         
         public IScoreCounter ScoreCounter => _scoreCounter;
 
-        // Get the player data to display at the UI. If the value is `None`, then the game is not running.
-        Option<IPlayerUIData> IUIPlayerDataModel.PlayerData => 
-            _isGameRunning
-                .ToOption(_inGameControllers.playerController)
-                .Map(static playerController => playerController.PlayerData); // Prevent `PlayerData` calculation when the `_isGameRunning == false`
+        public IUIPlayerDataModel PlayerDataModel => _inGameControllers.PlayerDataModel;
 
         public GameController(GameConfigSO gameConfig, Camera mainCamera, GameEventDispatcher eventDispatcher) {
             _screenBoundsChecker = new ScreenBoundsChecker(
                 mainCamera, 
-                screenBoundsThreshold: gameConfig.ScreenBoundsThreshold, 
-                teleportThresholdForScreenBounds: gameConfig.TeleportPositionForScreenBounds
+                screenBoundsThreshold: gameConfig.ScreenBoundsConfig.ScreenBoundsThreshold, 
+                teleportThresholdForScreenBounds: gameConfig.ScreenBoundsConfig.TeleportPositionForScreenBounds
             );
-            _scoreCounter = new ScoreCounter(eventDispatcher, gameConfig);
+            _scoreCounter = new ScoreCounter(eventDispatcher, gameConfig.ScoreConfig);
 
             // Collision mask for the player. It and its weapons can only interact with the asteroids or enemies.
-            var playerCollisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
+            var playerCollisionMask = 
+                1 << gameConfig.AsteroidConfig.AsteroidPrefab.gameObject.layer 
+                | 1 << gameConfig.EnemyConfig.EnemyPrefab.gameObject.layer;
 
-            var playerController = new PlayerController(gameConfig, eventDispatcher, _screenBoundsChecker, playerCollisionMask);
+            var shootingConfigs = new[] { gameConfig.ShootingConfig };
+
+            var playerController = new PlayerController(
+                gameConfig.PlayerMovementConfig, shootingConfigs, gameConfig.LaserConfig, 
+                eventDispatcher, _screenBoundsChecker, playerCollisionMask
+            );
+
+            var enemyControllers = new [] {
+                new EnemyController(gameConfig.EnemyConfig, eventDispatcher, _screenBoundsChecker, playerController)
+            };
+
             _inGameControllers = new InGameControllers(
                 playerController,
-                new AsteroidController(gameConfig, eventDispatcher, _screenBoundsChecker),
-                new EnemyController(gameConfig, eventDispatcher, _screenBoundsChecker, playerController)
+                new AsteroidController(gameConfig.AsteroidConfig, eventDispatcher, _screenBoundsChecker),
+                enemyControllers
             );
 
             eventDispatcher.Subscribe(SimpleGameEvent.GameStarted, StartGame);
@@ -55,51 +53,55 @@ namespace Asteroids.Game {
         public void OnUpdate(float deltaTime) => _gameUpdate?.Invoke(deltaTime);
 
         void StartGame() {
-            _gameUpdate += _inGameControllers.OnUpdate;
-
-            _isGameRunning = true;
+            _gameUpdate += OnGameUpdate;
 
             _scoreCounter.Reset();
             _inGameControllers.Enable();
         }
 
         void FinishGame() {
-            _gameUpdate -= _inGameControllers.OnUpdate;
-
-            _isGameRunning = false;
+            _gameUpdate -= OnGameUpdate;
 
             _inGameControllers.Disable();
         }
 
-        class InGameControllers {
-            public readonly PlayerController playerController;
+        void OnGameUpdate(float deltaTime) => _inGameControllers.OnUpdate(deltaTime);
+
+        // Struct that collects all controllers that run during the game.
+        struct InGameControllers {
+            readonly PlayerController _playerController;
             readonly AsteroidController _asteroidController;
-            readonly EnemyController _enemyController;
+            // List of enemy controllers to make it possible to quickly introduce new enemies.
+            readonly EnemyController[] _enemyControllers;
+
+            public IUIPlayerDataModel PlayerDataModel => _playerController;
 
             public InGameControllers(
-                PlayerController playerController, AsteroidController asteroidController, EnemyController enemyController
+                PlayerController playerController, AsteroidController asteroidController, EnemyController[] enemyControllers
             ) {
-                this.playerController = playerController;
+                _playerController = playerController;
                 _asteroidController = asteroidController;
-                _enemyController = enemyController;
+                _enemyControllers = enemyControllers;
             }
 
             public void OnUpdate(float deltaTime) {
-                playerController.OnUpdate(deltaTime);
+                _playerController.OnUpdate(deltaTime);
                 _asteroidController.OnUpdate(deltaTime);
-                _enemyController.OnUpdate(deltaTime);
+
+                foreach (var controller in _enemyControllers) controller.OnUpdate(deltaTime);
             }
 
             public void Enable() {
-                playerController.Enable();
+                _playerController.Enable();
                 _asteroidController.Enable();
-                _enemyController.Enable();
+
+                foreach (var controller in _enemyControllers) controller.Enable();
             }
 
             public void Disable() {
-                playerController.Disable();
+                _playerController.Disable();
                 _asteroidController.Disable();
-                _enemyController.Disable();
+                foreach (var controller in _enemyControllers) controller.Disable();
             }
         }
     }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace Asteroids.Utils {
         void OnRelease();
     }
 
-    
+    // Wrapper for `GameObjectPool`. Allows you to track active objects.
     public abstract class PooledObjectsController<TView, TInit, TData> where TView : MonoBehaviour, IPoolView  {
         protected readonly GameObjectPool<TView> _viewPool;
         protected readonly HashSet<TInit> _activeObjects;
@@ -58,6 +57,7 @@ namespace Asteroids.Utils {
         public delegate Vector3 GetPosition(TData data);
     }
 
+    // Version of `PooledObjectsController` where objects are spawned on timer.
     public class PooledObjectsOnTimer<TView, TInit, TData> : PooledObjectsController<TView, TInit, TData> where TView : MonoBehaviour, IPoolView {
         readonly float _spawnPeriod;
         // We use fixed data for the objects that were spawned on timer
@@ -95,6 +95,7 @@ namespace Asteroids.Utils {
         }
     }
 
+    // Version of `PooledObjectsController` where objects are spawned on event.
     public class PooledObjectsOnEvent<TView, TInit, TData> : PooledObjectsController<TView, TInit, TData> where TView : MonoBehaviour, IPoolView {
         public PooledObjectsOnEvent(
             int poolInitialSize, CreateView createView, CreateInit createInit, GetView getView, GetPosition getPosition

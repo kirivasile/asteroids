@@ -42,6 +42,7 @@ namespace Asteroids.Game {
             currentSpeed += (movementInput * playerAcceleration - playerDeceleration) * deltaTime;
             currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
 
+
             var movementVector = playerForwardVector.value * currentSpeed * deltaTime;
 
             return new MovementInputHandledProof(movementVector, currentSpeed);

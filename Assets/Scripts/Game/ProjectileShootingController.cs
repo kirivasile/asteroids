@@ -7,6 +7,7 @@ using Asteroids.Views;
 namespace Asteroids.Game {
     using ProjectileViewPool = PooledObjectsOnEvent<ProjectileView, Projectile, Vector3>;
 
+    // Class responsible for the logic of the projectiles that players shoots. One controller for each type of projectile.
     public class ProjectileShootingController {
         readonly IShootingConfig _config;
         readonly ProjectileViewPool _projectilePool;
@@ -23,7 +24,7 @@ namespace Asteroids.Game {
 
             _projectilePool = new(
                 poolInitialSize: shootingConfig.ProjectilePoolInitialSize,
-                createView: () => Object.Instantiate(_config.PlayerShootingProjectile),
+                createView: () => Object.Instantiate(_config.Projectile),
                 createInit: createInit,
                 getView: init => init.view,
                 getPosition: data => data
@@ -38,7 +39,6 @@ namespace Asteroids.Game {
             }
         }
 
-        // Maybe split dispose and update in interfaces
         public void OnUpdate(float dTime) {
             var currentTime = Time.time;
 
@@ -69,12 +69,12 @@ namespace Asteroids.Game {
         }
 
         public void Enable() {
-            _config.MainShootAction.Enable();
-            _config.MainShootAction.performed += ctx => ShootProjectile();
+            _config.ShootAction.Enable();
+            _config.ShootAction.performed += ctx => ShootProjectile();
         }
 
         public void Disable() {
-            _config.MainShootAction.Disable();
+            _config.ShootAction.Disable();
             _projectilePool.Disable();
             _projectilesToDisableBuf.Clear();
         }

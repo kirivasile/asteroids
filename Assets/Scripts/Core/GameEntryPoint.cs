@@ -14,10 +14,6 @@ namespace Asteroids.Core {
         [SerializeField] GameConfigSO _gameConfig;
         [SerializeField] Camera _mainCamera;
 
-        GameController _gameController;
-        UIController _uiController; 
-        GameEventDispatcher _gameEventDispatcher;
-
         event Action<float> _onUpdate;
 
         void Start() {
@@ -27,15 +23,14 @@ namespace Asteroids.Core {
         void Update() => _onUpdate.Invoke(Time.deltaTime);
 
         void Initialize() {
-            _gameEventDispatcher = new GameEventDispatcher();
-            var gameController = _gameController = new GameController(_gameConfig, _mainCamera, _gameEventDispatcher);
-            _uiController = new UIController(
-                _preStartUI, _inGameUI, _postGameUI, _gameEventDispatcher, gameController.ScoreCounter, 
-                playerModel: gameController
+            var gameEventDispatcher = new GameEventDispatcher();
+            var gameController = new GameController(_gameConfig, _mainCamera, gameEventDispatcher);
+            var uiController = new UIController(
+                _preStartUI, _inGameUI, _postGameUI, gameEventDispatcher, gameController.ScoreCounter, 
+                playerModel: gameController.PlayerDataModel
             );
 
-            _onUpdate += _gameController.OnUpdate;
-            _onUpdate += _ => _uiController.OnUpdate();
+            _onUpdate += gameController.OnUpdate;
         }
 
     }

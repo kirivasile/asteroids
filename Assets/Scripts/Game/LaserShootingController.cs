@@ -1,10 +1,10 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Asteroids.Configs;
 using Asteroids.Utils;
 using Asteroids.Views;
 
 namespace Asteroids.Game {
+    // Class for controlling the laser weapon of the player.
     public class LaserShootingController {
         readonly ILaserConfig _gameConfig;
         readonly ILaserWeapon _player;
@@ -81,8 +81,8 @@ namespace Asteroids.Game {
         }
 
         public void Enable() {
-            _gameConfig.LaserShootAction.Enable();
-            _gameConfig.LaserShootAction.performed += ctx => ShootWithLaser();
+            _gameConfig.ShootAction.Enable();
+            _gameConfig.ShootAction.performed += ctx => ShootWithLaser();
 
             _laserNumCharges = _gameConfig.LaserStartCharges;
             _lastLaserRechargeHappened = None._;
@@ -90,7 +90,7 @@ namespace Asteroids.Game {
         }
 
         public void Disable() {
-            _gameConfig.LaserShootAction.Disable();
+            _gameConfig.ShootAction.Disable();
         }
 
         void ShootWithLaser() {

@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Utils\Unit.cs" />
+    <Compile Include="Assets\Scripts\Utils\ArrayExts.cs" />
     <Compile Include="Assets\Scripts\Utils\ScreenBoundsChecker.cs" />
     <Compile Include="Assets\Scripts\Utils\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\Option.cs" />

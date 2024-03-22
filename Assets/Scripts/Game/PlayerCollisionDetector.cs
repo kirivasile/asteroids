@@ -1,9 +1,8 @@
-using System;
-using Asteroids.Configs;
-using Asteroids.Views;
 using UnityEngine;
+using Asteroids.Views;
 
 namespace Asteroids.Game {
+    // Class that checks the player's collisions, and sends events if `Physics2D.CircleCast` has found something.
     public class PlayerCollisionDetector {
         readonly IMovablePlayer _player;
         readonly IPlayerSpeedSubscription _playerSpeedSubscription;
@@ -11,12 +10,11 @@ namespace Asteroids.Game {
         readonly LayerMask _collisionMask;
 
         public PlayerCollisionDetector(
-            IMovablePlayer player, IPlayerSpeedSubscription playerSpeedSubscription, IGameEventEmitter gameEventDispatcher, IPlayerConfig gameConfig, LayerMask collisionMask
+            IMovablePlayer player, IPlayerSpeedSubscription playerSpeedSubscription, IGameEventEmitter gameEventDispatcher, LayerMask collisionMask
         ) {
             _player = player;
             _playerSpeedSubscription = playerSpeedSubscription;
             _collisionMask = collisionMask;
-            // _collisionMask = 1 << gameConfig.AsteroidPrefab.gameObject.layer | 1 << gameConfig.EnemyPrefab.gameObject.layer;
             _gameEventDispatcher = gameEventDispatcher;
         }
 

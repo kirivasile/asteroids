@@ -1,14 +1,11 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Asteroids.Configs;
-using Asteroids.Utils;
-using Asteroids.Views;
 using UnityEngine;
+using Asteroids.Views;
 
 namespace Asteroids.Game {
+    // Class containg the logic of the enemies of the player.
     public class Enemy {
         public readonly EnemyView view;
+        
         readonly float _speed;
 
         public Enemy(EnemyView view, IGameEventEmitter eventDispatcher, float speed) {

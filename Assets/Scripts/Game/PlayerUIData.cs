@@ -9,6 +9,7 @@ namespace Asteroids.Game {
         float LaserRechargeTimer { get; }
     }
 
+    // Data used to display player's stats in UI.
     public readonly struct PlayerUIData : IPlayerUIData {
         readonly Vector2 _playerPosition;
         readonly float _playerRotation;
