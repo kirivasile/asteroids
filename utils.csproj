@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Utils\ScreenBoundsChecker.cs" />
     <Compile Include="Assets\Scripts\Utils\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\Utils\Option.cs" />
+    <Compile Include="Assets\Scripts\Utils\DisposableController.cs" />
     <Compile Include="Assets\Scripts\Utils\SideEffects.cs" />
     <Compile Include="Assets\Scripts\Utils\PooledObjectsController.cs" />
     <Compile Include="Assets\Scripts\Utils\NormalizedVector.cs" />

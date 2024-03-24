@@ -38,16 +38,9 @@ namespace Asteroids.Game {
             }
         }
 
-        public void Enable() {
-            _gameEventDispatcher.EnemyDestroyed += DisableEnemy;
-
-            _enemyPool.Enable();
-        }
-
-        public void Disable() {
-            _gameEventDispatcher.EnemyDestroyed -= DisableEnemy;
-
-            _enemyPool.Disable();
+        public void Enable(IDisposableTracker tracker) {
+            _gameEventDispatcher.SubscribeOnEnemyDestroyed(tracker, DisableEnemy);
+            _enemyPool.Enable(tracker);
         }
 
         void DisableEnemy(Enemy enemy) {

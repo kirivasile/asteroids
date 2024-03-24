@@ -37,7 +37,8 @@ namespace Asteroids.Game {
         }
 
         static MovementInputHandledProof HandleMovementInput(
-            float movementInput, float currentSpeed, float maxSpeed, float playerAcceleration, float playerDeceleration, Normalized<Vector3> playerForwardVector, float deltaTime
+            float movementInput, float currentSpeed, float maxSpeed, float playerAcceleration, float playerDeceleration, 
+            Normalized<Vector3> playerForwardVector, float deltaTime
         ) {
             currentSpeed += (movementInput * playerAcceleration - playerDeceleration) * deltaTime;
             currentSpeed = Mathf.Clamp(currentSpeed, 0f, maxSpeed);
@@ -55,12 +56,14 @@ namespace Asteroids.Game {
             player.Rotate(rotationProof.addedRotation);
         }
 
-        public void Enable() {
+        public void Enable(IDisposableTracker tracker) {
             _config.RotateAction.Enable();
             _config.MoveAction.Enable();
+
+            tracker.Track(Disable);
         }
 
-        public void Disable() {
+        void Disable() {
             CurrentSpeed = 0f;
 
             _config.RotateAction.Disable();

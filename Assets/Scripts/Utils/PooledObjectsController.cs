@@ -41,7 +41,11 @@ namespace Asteroids.Utils {
             }
         }
 
-        public virtual void Disable() {
+        public virtual void Enable(IDisposableTracker tracker) {
+            tracker.Track(Disable);
+        }
+
+        protected virtual void Disable() {
             foreach (var obj in _activeObjects) {
                 var view = _getView(obj);
                 view.OnRelease();
@@ -74,7 +78,8 @@ namespace Asteroids.Utils {
             _fixedData = data;
         }
 
-        public void Enable() {
+        public override void Enable(IDisposableTracker tracker) {
+            base.Enable(tracker);
             _isEnabled = true;
             _lastTimeSpawned = Some._(Time.time);
         }
@@ -88,7 +93,7 @@ namespace Asteroids.Utils {
             }
         }
 
-        public override void Disable() {
+        protected override void Disable() {
             base.Disable();
             _isEnabled = false;
             _lastTimeSpawned = None._;

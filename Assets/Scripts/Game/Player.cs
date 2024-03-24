@@ -16,7 +16,7 @@ namespace Asteroids.Game {
     public interface IMovablePlayer : IPlayerWithPosition {
         void Rotate(float value);
         void Move(Vector3 movementVector);
-        void ResetPosition();
+        void Reset();
     }
 
     // Interface for the laser weapon of the player.
@@ -47,7 +47,10 @@ namespace Asteroids.Game {
             set => _view.LaserIsActive = value;
         }
 
-        public Player(PlayerView view, IPlayerMovementConfig playerMovementConfig, ILaserConfig laserConfig, ScreenBoundsChecker screenBoundsChecker) {
+        public Player(
+            PlayerView view, IPlayerMovementConfig playerMovementConfig, ILaserConfig laserConfig, 
+            ScreenBoundsChecker screenBoundsChecker
+        ) {
             _view = view;
             _screenBoundsChecker = screenBoundsChecker;
             _laserLength = laserConfig.LaserLength;
@@ -71,12 +74,14 @@ namespace Asteroids.Game {
             _view.transform.position = _screenBoundsChecker.WrapScreenBounds(_view.transform.position + movementVector);
         }
 
-        public void ResetPosition() {
+        public void Reset() {
             _view.transform.position = _initialPosition;
+            _view.transform.rotation = Quaternion.identity;
         }
 
-        public void SetActive(bool value) {
-            _view.gameObject.SetActive(value);
+        public void Enable(IDisposableTracker tracker) {
+            _view.gameObject.SetActive(true);
+            tracker.Track(() => _view.gameObject.SetActive(false));
         }
 
         static Normalized<Vector3> ConvertEulerAnglesToVector(Vector3 eulerAngles) {

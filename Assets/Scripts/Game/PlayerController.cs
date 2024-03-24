@@ -9,28 +9,34 @@ namespace Asteroids.Game {
         Vector3 PlayerPosition { get; }
     }
 
+    // Model interface for the player UI.
     public interface IUIPlayerDataModel {
-        // Simple analogue to the reactive values.
-        event Action<IPlayerUIData> Observe;
+        void SubscribeOnPlayerUIData(IDisposableTracker tracker, Action<IPlayerUIData> handler);
     }
 
     // Controller responsible for all the systems connected to the player.
     public class PlayerController : IPlayerPositionSubscription, IUIPlayerDataModel {
+        // Player object representation
         readonly Player _player;
 
+        // Movement logic
         readonly PlayerMovementController _playerMovement;
+        // Projectile shooting logic
         // List of projectile controllers to make it possible to quickly introduce new weapons for the player
         readonly ProjectileShootingController[] _projectileShootingControllers;
+        // Laser shooting logic
         readonly LaserShootingController _laserShooting;
+        // Player collision detection
         readonly PlayerCollisionDetector _collisionDetector;
 
         Vector3 IPlayerPositionSubscription.PlayerPosition => _player.Position;
 
-        event Action<IPlayerUIData> _playerDataModelObserver;
+        // Used for implementation of `IUIPlayerDataModel` 
+        event Action<IPlayerUIData> _playerDataModelObservable;
 
-        event Action<IPlayerUIData> IUIPlayerDataModel.Observe {
-            add => _playerDataModelObserver += value;
-            remove => _playerDataModelObserver -= value;
+        void IUIPlayerDataModel.SubscribeOnPlayerUIData(IDisposableTracker tracker, Action<IPlayerUIData> handler) {
+            _playerDataModelObservable += handler;
+            tracker.Track(() => _playerDataModelObservable -= handler);
         }
 
         public PlayerController(
@@ -69,25 +75,17 @@ namespace Asteroids.Game {
                     laserRechargeTimer: _laserShooting.LaserRechargeTimer
                 );
 
-                _playerDataModelObserver?.Invoke(currentData);
+                _playerDataModelObservable?.Invoke(currentData);
             }
         }
 
-        public void Enable() {
-            _player.SetActive(true);
-            _player.ResetPosition();
-            _playerMovement.Enable();
-            _laserShooting.Enable();
+        public void Enable(IDisposableTracker gameTracker) {
+            _player.Enable(gameTracker);
+            _player.Reset();
+            _playerMovement.Enable(gameTracker);
+            _laserShooting.Enable(gameTracker);
 
-            foreach (var controller in _projectileShootingControllers) controller.Enable();
-        }
-
-        public void Disable() {
-            _player.SetActive(false);
-            _playerMovement.Disable();
-            _laserShooting.Disable();
-
-            foreach (var controller in _projectileShootingControllers) controller.Disable();
+            foreach (var controller in _projectileShootingControllers) controller.Enable(gameTracker);
         }
 
         

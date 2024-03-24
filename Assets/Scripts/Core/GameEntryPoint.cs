@@ -4,6 +4,7 @@ using UnityEngine;
 using Asteroids.Game;
 using Asteroids.UI;
 using Asteroids.Configs;
+using Asteroids.Utils;
 
 namespace Asteroids.Core {
     // Game entry point.
@@ -24,10 +25,17 @@ namespace Asteroids.Core {
 
         void Initialize() {
             var gameEventDispatcher = new GameEventDispatcher();
-            var gameController = new GameController(_gameConfig, _mainCamera, gameEventDispatcher);
+            // This controller won't call any dispose. 
+            // I use it for the the subscriptions that should persist after the game finished and restarted.
+            var noDisposableController = new NoDisposableController();
+            var scoreCounter = new ScoreCounter(gameEventDispatcher, _gameConfig.ScoreConfig, noDisposableController);
+
+            var gameController = new GameController(
+                _gameConfig, _mainCamera, gameEventDispatcher, noDisposableController, scoreCounter
+            );
             var uiController = new UIController(
-                _preStartUI, _inGameUI, _postGameUI, gameEventDispatcher, gameController.ScoreCounter, 
-                playerModel: gameController.PlayerDataModel
+                _preStartUI, _inGameUI, _postGameUI, gameEventDispatcher, noDisposableController, 
+                scoreCounter,  gameController.PlayerDataModel
             );
 
             _onUpdate += gameController.OnUpdate;

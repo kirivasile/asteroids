@@ -1,5 +1,6 @@
 using System;
 using Asteroids.Configs;
+using Asteroids.Utils;
 
 namespace Asteroids.Game {
     public interface IScoreCounter {
@@ -13,10 +14,10 @@ namespace Asteroids.Game {
 
         int IScoreCounter.Score => _score;
 
-        public ScoreCounter(IGameEventSubscriber gameEventDispatcher, IScoreConfig scoreConfig) {
+        public ScoreCounter(IGameEventSubscriber gameEventDispatcher, IScoreConfig scoreConfig, IDisposableTracker tracker) {
             _scoreConfig = scoreConfig;
 
-            gameEventDispatcher.PlayerScored += OnPlayerScored;
+            gameEventDispatcher.SubscribeOnPlayerScored(tracker, OnPlayerScored);
 
             Reset();
         }

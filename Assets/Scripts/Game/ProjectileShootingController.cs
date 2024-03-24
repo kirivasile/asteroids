@@ -68,14 +68,16 @@ namespace Asteroids.Game {
             }
         }
 
-        public void Enable() {
+        public void Enable(IDisposableTracker tracker) {
             _config.ShootAction.Enable();
             _config.ShootAction.performed += ctx => ShootProjectile();
+            _projectilePool.Enable(tracker);
+
+            tracker.Track(Disable);
         }
 
-        public void Disable() {
+        void Disable() {
             _config.ShootAction.Disable();
-            _projectilePool.Disable();
             _projectilesToDisableBuf.Clear();
         }
 

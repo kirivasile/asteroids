@@ -80,17 +80,15 @@ namespace Asteroids.Game {
             }
         }
 
-        public void Enable() {
+        public void Enable(IDisposableTracker tracker) {
             _gameConfig.ShootAction.Enable();
+            tracker.Track(_gameConfig.ShootAction.Disable);
+
             _gameConfig.ShootAction.performed += ctx => ShootWithLaser();
 
             _laserNumCharges = _gameConfig.LaserStartCharges;
             _lastLaserRechargeHappened = None._;
             _lastLaserShootStarted = None._;
-        }
-
-        public void Disable() {
-            _gameConfig.ShootAction.Disable();
         }
 
         void ShootWithLaser() {

@@ -13,7 +13,9 @@ namespace Asteroids.Game {
         readonly AsteroidMiniViewPool _miniAsteroidPool;
         readonly IGameEventSubscriber _eventDispatcher;
 
-        public AsteroidController(IAsteroidConfig config, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker) {
+        public AsteroidController(
+            IAsteroidConfig config, GameEventDispatcher eventDispatcher, ScreenBoundsChecker screenBoundsChecker
+        ) {
             _asteroidConfig = config;
             _eventDispatcher = eventDispatcher;
             _asteroidPool = new(
@@ -61,19 +63,12 @@ namespace Asteroids.Game {
             }
         }
 
-        public void Enable() {
-            _asteroidPool.Enable();
+        public void Enable(IDisposableTracker tracker) {
+            _asteroidPool.Enable(tracker);
+            _miniAsteroidPool.Enable(tracker);
 
-            _eventDispatcher.AsteroidDestroyed += DisableAsteroid;
-            _eventDispatcher.MiniAsteroidDestroyed += DisableAsteroidMini;
-        }
-
-        public void Disable() {
-            _eventDispatcher.AsteroidDestroyed -= DisableAsteroid;
-            _eventDispatcher.MiniAsteroidDestroyed -= DisableAsteroidMini;
-
-            _asteroidPool.Disable();
-            _miniAsteroidPool.Disable();
+            _eventDispatcher.SubscribeOnAsteroidDestroyed(tracker, DisableAsteroid);
+            _eventDispatcher.SubscribeOnMiniAsteroidDestroyed(tracker, DisableAsteroidMini);
         }
 
         void DisableAsteroid(Asteroid asteroid, AsteroidView.PlayerWeaponType weaponType) {

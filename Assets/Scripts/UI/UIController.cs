@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using Asteroids.Game;
+using Asteroids.Utils;
 
 namespace Asteroids.UI {
     // Represents a view that uses the whole screen.
@@ -11,7 +13,7 @@ namespace Asteroids.UI {
     public class UIController {
         public UIController(
             PreStartView preStartUI, InGameUIView inGameUI, PostGameUIView postGameUI,
-            GameEventDispatcher eventDispatcher, 
+            GameEventDispatcher eventDispatcher, IDisposableTracker tracker,
             IScoreCounter scoreCounter, IUIPlayerDataModel playerModel
         ) {
             var screenSelector = new ScreenViewSelector(preStartUI, inGameUI, postGameUI);
@@ -21,8 +23,8 @@ namespace Asteroids.UI {
             preStartUI.BindStartGame(StartGame);
             postGameUI.BindRestartGame(StartGame);
 
-            eventDispatcher.Subscribe(SimpleGameEvent.GameFinished, ShowPostGameUI);
-            playerModel.Observe += inGameUI.UpdateView;
+            eventDispatcher.Subscribe(tracker, SimpleGameEvent.GameFinished, ShowPostGameUI);
+            playerModel.SubscribeOnPlayerUIData(tracker, UpdateView);
 
             void StartGame() {
                 eventDispatcher.Push(SimpleGameEvent.GameStarted);
@@ -33,6 +35,8 @@ namespace Asteroids.UI {
                 screenSelector.Show(postGameUI);
                 postGameUI.UpdateData(scoreCounter.Score);
             }
+
+            void UpdateView(IPlayerUIData updateData) => inGameUI.UpdateView(updateData);
         }
 
         // Helper class to enforce the rull, that every `IScreenView` is shown alone.
