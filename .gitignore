@@ -1,6 +1,6 @@
 Library/
 Temp/
 Obj/
-.vs/
-.vscode/
+.vs/*
+.vscode/*
 Logs/
