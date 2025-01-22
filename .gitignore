@@ -1,6 +1,6 @@
-/Library/
-/Temp/
-/Obj/
+Library/
+Temp/
+Obj/
 .vs/
 .vscode/
-/Logs/
+Logs/
